@@ -1,12 +1,13 @@
+ // I added the ability to save and load the journal to and from JSON.
+// I also added a extra propmts to the PromptGenerator class.
+// I further made the entries time to include both date and full time of the entry.
+
 using System;
 
 class Program
 {
     static void Main(string[] args)
     {
-
-      // I added the ability to save and load the journal to and from JSON.
-      // I also added a extra propmts to the PromptGenerator class.
 
         Journal journal = new Journal();
         PromptGenerator promptGenerator = new PromptGenerator();
