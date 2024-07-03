@@ -121,7 +121,7 @@ class Program
                 }
                 catch (IOException)
                 {
-                    // Ignoring any IOExceptions as per your requirement
+                  
                 }
             }
         }
