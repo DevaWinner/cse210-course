@@ -1,15 +1,15 @@
-public class EternalGoal : Goal
+public class NegativeGoal : Goal
 {
-    public EternalGoal(string name, string description, int points)
+    public NegativeGoal(string name, string description, int points)
         : base(name, description, points)
     {
     }
 
-    public EternalGoal() : base() { }
+    public NegativeGoal() : base() { }
 
     public override void RecordEvent()
     {
-        // Eternal goals do not get completed, just to record the event
+        // Negative goals do not get completed, just to record the event
     }
 
     public override bool IsComplete()
@@ -24,13 +24,13 @@ public class EternalGoal : Goal
 
     public override string GetStringRepresentation()
     {
-        return $"EternalGoal:{ShortName},{Description},{Points}";
+        return $"NegativeGoal:{ShortName},{Description},{Points}";
     }
 
-    public static EternalGoal FromString(string data)
+    public static NegativeGoal FromString(string data)
     {
         var parts = data.Split(',');
-        return new EternalGoal
+        return new NegativeGoal
         {
             ShortName = parts[0],
             Description = parts[1],

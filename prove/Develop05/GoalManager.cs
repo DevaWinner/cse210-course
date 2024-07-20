@@ -104,6 +104,7 @@ public class GoalManager
             Console.WriteLine("  1. Simple Goal");
             Console.WriteLine("  2. Eternal Goal");
             Console.WriteLine("  3. Checklist Goal");
+            Console.WriteLine("  4. Negative Goal");
             Console.Write("\nEnter your choice: ");
             string choice = Console.ReadLine();
 
@@ -128,6 +129,9 @@ public class GoalManager
                     Console.Write("\nEnter goal bonus: ");
                     int bonus = int.Parse(Console.ReadLine());
                     _goals.Add(new ChecklistGoal(name, description, points, target, bonus));
+                    break;
+                case "4":
+                    _goals.Add(new NegativeGoal(name, description, points));
                     break;
                 default:
                     Console.WriteLine("\nInvalid goal type. Please try again.");
@@ -169,7 +173,7 @@ public class GoalManager
                 {
                     if (!_goals[i].IsComplete())
                     {
-                        Console.WriteLine($"  {incompleteGoalIndices.Count + 1}. {_goals[i].GetDetailsString()}");
+                        Console.WriteLine($"  {incompleteGoalIndices.Count + 1}. {_goals[i].ShortName}");
                         incompleteGoalIndices.Add(i);
                     }
                 }
@@ -182,16 +186,15 @@ public class GoalManager
                 }
 
                 Console.Write("\nEnter the goal index to record event: ");
-                int goalIndex = int.Parse(Console.ReadLine()) - 1;
-
-                if (goalIndex < 0 || goalIndex >= incompleteGoalIndices.Count)
+                int goalIndex;
+                if (!int.TryParse(Console.ReadLine(), out goalIndex) || goalIndex < 1 || goalIndex > incompleteGoalIndices.Count)
                 {
-                    Console.WriteLine("Invalid goal index.");
+                    Console.WriteLine("\nInvalid goal index. Please enter a valid number.");
                     PressAnyKeyToContinue();
                     continue;
                 }
 
-                Goal goal = _goals[incompleteGoalIndices[goalIndex]];
+                Goal goal = _goals[incompleteGoalIndices[goalIndex - 1]];
                 goal.RecordEvent();
                 int pointsEarned = goal.Points;
 
@@ -200,11 +203,18 @@ public class GoalManager
                     pointsEarned += checklistGoal.Bonus;
                     _score += pointsEarned;
                     Console.WriteLine($"\nGoal completed! You earned {pointsEarned} points.");
+                    DisplayCelebrationEffect();
+                }
+                else if (goal is NegativeGoal)
+                {
+                    _score += pointsEarned;
+                    Console.WriteLine($"\nBad habit recorded! You lost {-pointsEarned} points.");
                 }
                 else
                 {
                     _score += pointsEarned;
                     Console.WriteLine($"\nCongratulations! You earned {pointsEarned} points for recording this event.");
+                    DisplayCelebrationEffect();
                 }
 
                 PressAnyKeyToContinue();
@@ -212,15 +222,36 @@ public class GoalManager
             }
             catch (FormatException)
             {
-                Console.WriteLine("Invalid input. Please enter a valid number.");
+                Console.WriteLine("\nInvalid input. Please enter a valid number.");
                 PressAnyKeyToContinue();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Console.WriteLine($"\nAn error occurred: {ex.Message}");
                 PressAnyKeyToContinue();
             }
         }
+    }
+
+    private void DisplayCelebrationEffect()
+    {
+        Random random = new Random();
+        for (int i = 0; i < 10; i++)
+        {
+            Console.Clear();
+            DisplayAppName();
+            for (int j = 0; j < 10; j++)
+            {
+                int left = random.Next(Console.WindowWidth);
+                int top = random.Next(Console.WindowHeight - 4);
+                Console.SetCursorPosition(left, top);
+                Console.Write("*");
+            }
+            System.Threading.Thread.Sleep(200);
+        }
+        Console.Clear();
+        DisplayAppName();
+        Console.WriteLine("\nGoal completed! Congratulations!");
     }
 
     public void SaveGoals()
@@ -245,7 +276,7 @@ public class GoalManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+            Console.WriteLine($"\nAn error occurred: {ex.Message}");
         }
 
         PressAnyKeyToContinue();
@@ -261,7 +292,7 @@ public class GoalManager
 
         if (!File.Exists(fileName))
         {
-            Console.WriteLine("File not found.");
+            Console.WriteLine("\nFile not found.");
         }
         else
         {
@@ -289,6 +320,9 @@ public class GoalManager
                         case "ChecklistGoal":
                             goal = ChecklistGoal.FromString(data);
                             break;
+                        case "NegativeGoal":
+                            goal = NegativeGoal.FromString(data);
+                            break;
                     }
 
                     if (goal != null)
@@ -297,11 +331,11 @@ public class GoalManager
                     }
                 }
 
-                Console.WriteLine("Goals loaded successfully.");
+                Console.WriteLine("\nGoals loaded successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading goals: {ex.Message}");
+                Console.WriteLine($"\nError loading goals: {ex.Message}");
             }
         }
 
