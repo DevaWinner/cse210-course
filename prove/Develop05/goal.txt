@@ -1,0 +1,4 @@
+150
+SimpleGoal:Read,I will read 2,100,True
+EternalGoal:Kill,I will kill,50
+ChecklistGoal:i will do,I will do that,40,2,200,0
